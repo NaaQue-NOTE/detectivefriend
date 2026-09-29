@@ -1,0 +1,261 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light">
+  <meta name="referrer" content="no-referrer">
+  <title>탐정친구 · 로컬 채팅</title>
+  <link rel="icon" href="data:,">
+  <style>
+*{box-sizing:border-box} :root{font-family:"맑은 고딕","Malgun Gothic",system-ui,sans-serif;color:#233e3b;background:#f4f5f0;font-synthesis:none}body{margin:0}button,input,select,textarea{font:inherit}button{cursor:pointer}button:disabled{cursor:not-allowed;opacity:.48}button,input,select,textarea,summary{outline-offset:4px}a{color:inherit}.masthead{max-width:1280px;margin:auto;padding:28px 40px;display:flex;align-items:center;justify-content:space-between}.brand{text-decoration:none;font-weight:800;font-size:22px;letter-spacing:-1px;display:flex;align-items:center;gap:10px}.brand-icon{width:36px;height:36px;background:#1c665d;border-radius:11px;color:white;font-size:33px;line-height:28px;text-align:center}.tag{font-size:12px;color:#5b6d65;border:1px solid #d4ddd4;border-radius:20px;padding:8px 13px}.workspace{display:grid;grid-template-columns:320px minmax(0,1fr);max-width:1200px;margin:0 auto;border:1px solid #dce3da;border-radius:22px;overflow:hidden;background:white;box-shadow:0 12px 40px #25453b06;min-height:700px}.settings{padding:32px 28px;background:#edf1e9;border-right:1px solid #dce3da}.eyebrow{font-size:11px;color:#62786d;letter-spacing:1.4px;font-weight:700;margin:0 0 12px}h1{font-size:23px;letter-spacing:-1px;line-height:1.4;margin:0 0 12px}h2{font-size:19px;margin:0;letter-spacing:-.6px}.intro{font-size:14px;color:#65736b;line-height:1.8;margin:0 0 24px}.steps{padding:17px 14px 17px 32px;background:#ffffff85;border:1px solid #dbe3d6;border-radius:12px;line-height:1.9;font-size:12px;color:#526659;margin-bottom:26px}.steps li{padding-left:3px}label{display:block;font-size:12px;font-weight:700;margin:19px 0 9px}input,select{width:100%;border:1px solid #cbd6ca;border-radius:8px;background:#fff;padding:11px 10px;color:#233e3b;min-width:0;font-size:13px}select{text-overflow:ellipsis}.hint{color:#63776b;font-size:11px;line-height:1.7;margin:7px 0 14px}details{font-size:12px;color:#5a6e60;line-height:1.7}summary{cursor:pointer;padding:4px 0}details label{margin-top:10px}.primary{border:0;background:#23695d;color:#fff;padding:12px 18px;border-radius:9px;font-size:13px;font-weight:700}.primary:not(:disabled):hover{background:#195348}.full{width:100%;margin-top:17px}.status{font-size:12px;line-height:1.7;white-space:pre-wrap;overflow-wrap:anywhere;padding:12px;background:#e2e9df;border-radius:8px;color:#51665b}.status[data-tone="success"]{background:#dcece3;color:#155541}.status[data-tone="error"]{background:#f7e8df;color:#8e4230}.help{border-top:1px solid #d1dccf;margin-top:22px;padding-top:14px}.privacy{font-size:11px;line-height:1.8;color:#78877b;margin:24px 0 0}.chat{display:flex;flex-direction:column;min-width:0;background:#fff;min-height:700px;height:calc(100dvh - 158px);max-height:1000px}.chat-header{display:flex;justify-content:space-between;align-items:center;padding:27px 30px;border-bottom:1px solid #edf0e9}.chat-header .eyebrow{margin-bottom:7px}.subtle{color:#587068;background:#f3f5ef;border:1px solid #dce4d8;border-radius:8px;padding:9px 12px;font-size:12px}.messages{overflow:auto;flex:1;min-height:220px;padding:26px 30px;scroll-behavior:smooth}.empty{height:100%;min-height:290px;display:flex;align-items:center;justify-content:center;flex-direction:column;text-align:center}.empty-icon{background:#f0f3ec;border:1px solid #dfe7d8;width:64px;height:64px;border-radius:22px;font-family:Georgia,serif;font-size:75px;color:#608174;line-height:92px;margin-bottom:10px}.empty h3{font-size:20px;letter-spacing:-.5px;font-weight:600;margin:19px 0 8px}.empty p{font-size:14px;color:#809083;line-height:1.8;margin:0}.empty-note{margin-top:28px;font-size:11px;color:#8c978c}.message{margin:0 0 23px;max-width:91%;display:flex;flex-direction:column;align-items:flex-start}.message.user{margin-left:auto;align-items:flex-end}.message-label{font-size:11px;color:#78867b;margin:0 4px 7px}.bubble{white-space:pre-wrap;overflow-wrap:anywhere;line-height:1.8;font-size:14px;border-radius:2px 15px 15px 15px;background:#f0f3ec;padding:14px 18px;color:#314a40}.user .bubble{background:#286c60;color:#fff;border-radius:15px 2px 15px 15px}.message.failed .bubble{opacity:.6}.message-note{font-size:11px;color:#8d5541;margin-top:6px}.chat-status{font-size:12px;line-height:1.6;color:#63796b;min-height:30px;padding:0 30px;white-space:pre-wrap}.chat-status[data-tone="error"]{color:#9c4c36}.composer{margin:0 26px;display:flex;gap:12px;align-items:flex-end;padding:12px;border:1px solid #d9e2d5;background:#fafbf8;border-radius:13px}.composer:focus-within{border-color:#6e9a87;box-shadow:0 0 0 2px #2a725b0d}textarea{resize:vertical;min-height:52px;max-height:180px;width:100%;border:0;background:transparent;outline:none;padding:5px;font-size:14px;line-height:1.6;color:#233e3b}textarea::placeholder{color:#8d988e}textarea:disabled{resize:none}.composer button{flex-shrink:0;min-height:43px}.chat-footer{display:flex;justify-content:space-between;gap:10px;padding:11px 30px 23px;color:#899587;font-size:10px}.page-footer{max-width:1200px;margin:17px auto 22px;font-size:11px;color:#8c978b;display:flex;justify-content:space-between}.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);border:0}[hidden]{display:none!important}@media(max-width:900px){.masthead{padding:22px}.workspace{margin:0 18px;grid-template-columns:280px minmax(0,1fr)}.settings{padding:26px 20px}.chat-header{padding:24px 22px}.page-footer{margin:17px 22px}.chat-footer{flex-direction:column;gap:4px}}@media(max-width:650px){.masthead{padding:18px}.tag{font-size:10px;padding:7px 9px}.workspace{grid-template-columns:1fr;margin:0 12px;border-radius:16px}.settings{border-right:0;border-bottom:1px solid #dce3da;padding:24px}.intro br{display:none}.steps{margin:16px 0}.privacy{margin-top:15px}.chat{height:650px;min-height:550px;max-height:none}.messages{padding:20px}.chat-header{padding:22px}.composer{margin:0 16px;gap:5px}.composer button{padding:10px 13px}.chat-footer{padding:10px 21px 20px}.page-footer span{display:none}.chat-status{padding:0 21px}.message{max-width:96%}}
+
+</style>
+  
+</head>
+<body>
+  <header class="masthead"><a class="brand" href="./"><span class="brand-icon" aria-hidden="true">⌕</span>탐정친구</a><span class="tag">첫 번째 실험 · 로컬 채팅</span></header>
+  <main class="workspace">
+    <aside class="settings" aria-labelledby="connection-heading">
+      <p class="eyebrow">내 컴퓨터의 AI</p>
+      <h1 id="connection-heading">먼저, 연결해 볼까요?</h1>
+      <p class="intro">LM Studio에서 실행한 모델과<br>이곳에서 대화할 수 있어요.</p>
+      <ol class="steps"><li>같은 PC에서 LM Studio를 켜 주세요.</li><li>모델과 API 서버를 준비해 주세요.</li><li>서버 설정의 <b>Enable CORS</b>를 켜 주세요.</li></ol>
+      <form id="connection-form">
+        <label for="server">서버 주소</label>
+        <input id="server" type="url" value="http://127.0.0.1:1234" required spellcheck="false" autocomplete="off" aria-describedby="server-hint">
+        <p id="server-hint" class="hint">LM Studio에 표시된 주소를 입력해 주세요.</p>
+        <details><summary>인증 토큰이 필요한 경우</summary><label for="token">인증 토큰</label><input id="token" type="password" autocomplete="off" placeholder="인증을 켰을 때만 입력" spellcheck="false"><p class="hint">토큰은 저장하지 않으며 창을 닫으면 지워집니다.</p></details>
+        <button id="connect" class="primary full" type="submit">연결 확인</button>
+        <label for="model">대화할 모델</label><select id="model" disabled><option value="">연결하면 모델이 표시됩니다</option></select>
+      </form>
+      <p id="connection-status" class="status" role="status" aria-live="polite">아직 연결하지 않았습니다.</p>
+      <details class="help"><summary>연결이 안 되나요?</summary><p>서버 실행 상태, 주소, CORS 설정을 확인해 주세요. 브라우저가 로컬 네트워크 연결 권한을 물으면 허용해 주세요.</p><p>이 주소는 웹페이지를 연 PC를 가리킵니다. 휴대전화에서 접속하면 PC의 AI에 자동 연결되지 않습니다.</p></details>
+      <p class="privacy">대화는 선택한 서버로 직접 전송합니다.<br>대화 내용과 토큰은 별도로 저장하지 않습니다.</p>
+    </aside>
+    <section class="chat" aria-labelledby="chat-heading">
+      <div class="chat-header"><div><p class="eyebrow">대화 공간</p><h2 id="chat-heading">로컬 AI와 첫 대화</h2></div><button id="clear" class="subtle" type="button" disabled>새 대화</button></div>
+      <div id="messages" class="messages" role="log" aria-live="polite" aria-relevant="additions text">
+        <div id="empty" class="empty"><span class="empty-icon" aria-hidden="true">“</span><h3>당신의 AI를 만나 보세요.</h3><p>왼쪽에서 모델을 연결한 뒤<br>첫 메시지를 보내 주세요.</p><span class="empty-note">이번 버전은 채팅 연결만 시험합니다.</span></div>
+      </div>
+      <div id="chat-status" class="chat-status" role="status" aria-live="polite"></div>
+      <form id="chat-form" class="composer"><label class="sr-only" for="prompt">메시지</label><textarea id="prompt" rows="2" maxlength="4000" disabled placeholder="모델을 연결하면 대화를 시작할 수 있어요."></textarea><button id="send" class="primary" type="submit" disabled>보내기 <span aria-hidden="true">↑</span></button><button id="stop" class="subtle" type="button" hidden>중지</button></form>
+      <div class="chat-footer"><span>Enter 전송 · Shift + Enter 줄바꿈</span><span>최근 12번의 대화를 기억합니다.</span></div>
+    </section>
+  </main>
+  <footer class="page-footer">탐정친구 프로토타입 0.1 <span>게임의 시작은, 한 번의 대화부터.</span></footer>
+<script type="module">
+function normalizeBase(value) {
+  let url;
+  try { url = new URL(value.trim()); } catch { throw new Error('서버 주소를 http:// 또는 https://로 시작하도록 입력해 주세요.'); }
+  if (!['http:', 'https:'].includes(url.protocol) || url.username || url.password || url.search || url.hash) {
+    throw new Error('인증 정보·검색 문자열 없이 http:// 또는 https:// 서버 주소를 입력해 주세요.');
+  }
+  const path = url.pathname.replace(/\/+$/, '');
+  if (path && path !== '/v1') throw new Error('서버 주소 또는 /v1까지만 입력해 주세요.');
+  return `${url.origin}/v1`;
+}
+
+async function requestJSON(base, path, { token = '', signal, body } = {}) {
+  const headers = { Accept: 'application/json' };
+  if (body !== undefined) headers['Content-Type'] = 'application/json';
+  if (token.trim()) headers.Authorization = `Bearer ${token.trim()}`;
+  let response;
+  try {
+    response = await fetch(`${base}${path}`, {
+      method: body === undefined ? 'GET' : 'POST', headers, signal,
+      ...(body === undefined ? {} : { body: JSON.stringify(body) }),
+      credentials: 'omit', redirect: 'error', referrerPolicy: 'no-referrer', cache: 'no-store',
+    });
+  } catch (error) {
+    if (signal?.aborted) throw error;
+    throw new Error('서버에 연결하지 못했습니다. 서버 주소·실행 상태·Enable CORS·브라우저의 로컬 연결 권한을 확인해 주세요.');
+  }
+  if (!response.ok) {
+    const descriptions = {
+      400: '모델이 요청을 처리하지 못했습니다. 모델 상태를 확인하거나 새 대화로 다시 시도해 주세요.',
+      401: '인증 토큰을 확인해 주세요.', 403: '접근이 거부되었습니다. 인증과 서버 접근 설정을 확인해 주세요.',
+      404: 'API 주소나 선택한 모델을 찾을 수 없습니다. 연결을 다시 확인해 주세요.',
+      429: '서버가 사용 중입니다. 잠시 뒤 다시 시도해 주세요.',
+    };
+    throw new Error(`서버 오류 ${response.status}: ${descriptions[response.status] || 'LM Studio에서 모델과 서버 상태를 확인해 주세요.'}`);
+  }
+  try { return await response.json(); } catch { throw new Error('서버 응답을 읽지 못했습니다. LM Studio API 주소인지 확인해 주세요.'); }
+}
+
+function modelIds(data) {
+  if (!Array.isArray(data?.data)) throw new Error('모델 목록 형식이 올바르지 않습니다. API 주소를 확인해 주세요.');
+  return [...new Set(data.data.map(item => item?.id).filter(id => typeof id === 'string' && id.trim()))];
+}
+
+function chatMessages(history, text) {
+  return [
+    { role: 'system', content: '당신은 로컬 AI 연결을 테스트하는 친절한 대화 도우미입니다. 한국어 존댓말로 간결하게 답변하세요.' },
+    ...history.slice(-24), { role: 'user', content: text },
+  ];
+}
+
+function assistantText(data) {
+  const choice = data?.choices?.[0];
+  const content = choice?.message?.content;
+  if (typeof content !== 'string' || !content.trim()) {
+    throw new Error('모델이 표시할 답변을 보내지 않았습니다. LM Studio에서 모델의 응답 설정을 확인해 주세요.');
+  }
+  return { text: content.trim(), limited: choice.finish_reason === 'length' };
+}
+
+
+const $ = id => document.getElementById(id);
+const ui = Object.fromEntries(['server', 'token', 'connect', 'model', 'connection-status', 'prompt', 'send', 'stop', 'clear', 'messages', 'empty', 'chat-status'].map(id => [id, $(id)]));
+let connected = false;
+let busy = false;
+let base = '';
+let history = [];
+let controller = null;
+let lastProfile = '';
+let chatCount = 0;
+
+try { ui.server.value = localStorage.getItem('detectivefriend.server') || ui.server.value; } catch { /* 저장소 접근이 막혀도 채팅은 사용합니다. */ }
+
+function status(target, message, tone = '') { target.textContent = message; target.dataset.tone = tone; }
+function controls() {
+  ui.connect.disabled = busy;
+  ui.server.disabled = busy;
+  ui.token.disabled = busy;
+  ui.model.disabled = busy || !connected;
+  ui.prompt.disabled = busy || !connected || !ui.model.value;
+  ui.send.disabled = busy || !connected || !ui.model.value || !ui.prompt.value.trim();
+  ui.clear.disabled = busy || chatCount === 0;
+  ui.stop.hidden = !busy;
+  ui.send.hidden = busy;
+  ui.prompt.placeholder = connected ? '메시지를 입력해 주세요.' : '모델을 연결하면 대화를 시작할 수 있어요.';
+}
+function resetChat() {
+  history = [];
+  chatCount = 0;
+  ui.messages.querySelectorAll('.message').forEach(node => node.remove());
+  ui.empty.hidden = false;
+  ui.prompt.value = '';
+  status(ui['chat-status'], '');
+  controls();
+}
+function invalidate() {
+  connected = false;
+  status(ui['connection-status'], '설정이 바뀌었습니다. 연결을 다시 확인해 주세요.');
+  controls();
+}
+function bubble(role, text) {
+  ui.empty.hidden = true;
+  const article = document.createElement('article');
+  article.className = `message ${role}`;
+  const label = document.createElement('div');
+  label.className = 'message-label';
+  label.textContent = role === 'user' ? '나' : ui.model.value;
+  const content = document.createElement('div');
+  content.className = 'bubble';
+  content.textContent = text;
+  article.append(label, content);
+  ui.messages.append(article);
+  chatCount++;
+  ui.messages.scrollTop = ui.messages.scrollHeight;
+  return article;
+}
+ui.server.addEventListener('input', invalidate);
+ui.token.addEventListener('input', invalidate);
+ui.prompt.addEventListener('input', controls);
+ui.clear.addEventListener('click', resetChat);
+ui.stop.addEventListener('click', () => controller?.abort());
+ui.model.addEventListener('change', () => {
+  resetChat();
+  lastProfile = `${base}|${ui.model.value}`;
+  status(ui['chat-status'], '선택한 모델로 새 대화를 시작합니다.');
+});
+
+$('connection-form').addEventListener('submit', async event => {
+  event.preventDefault();
+  if (busy) return;
+  try { base = normalizeBase(ui.server.value); }
+  catch (error) { connected = false; status(ui['connection-status'], error.message, 'error'); controls(); return; }
+  connected = false;
+  busy = true;
+  controller = new AbortController();
+  let timedOut = false;
+  const timeout = setTimeout(() => { timedOut = true; controller?.abort(); }, 15000);
+  const oldModel = ui.model.value;
+  status(ui['connection-status'], '서버와 모델 목록을 확인하고 있습니다…');
+  controls();
+  try {
+    const ids = modelIds(await requestJSON(base, '/models', { token: ui.token.value, signal: controller.signal }));
+    ui.model.replaceChildren();
+    if (!ids.length) throw new Error('사용할 모델이 없습니다. LM Studio에서 모델을 준비한 뒤 다시 확인해 주세요.');
+    ids.forEach(id => ui.model.add(new Option(id, id)));
+    if (ids.includes(oldModel)) ui.model.value = oldModel;
+    else ui.model.value = ids.find(id => /gemma/i.test(id)) || ids[0];
+    const profile = `${base}|${ui.model.value}`;
+    if (lastProfile && lastProfile !== profile) resetChat();
+    lastProfile = profile;
+    connected = true;
+    try { localStorage.setItem('detectivefriend.server', ui.server.value); } catch { /* 선택 기능입니다. */ }
+    status(ui['connection-status'], `서버 연결됨 · 모델 ${ids.length}개\n메시지를 보내 실제 응답을 확인해 주세요.`, 'success');
+  } catch (error) {
+    ui.model.replaceChildren(new Option('연결하면 모델이 표시됩니다', ''));
+    status(ui['connection-status'], controller.signal.aborted ? (timedOut ? '15초 안에 응답이 없었습니다. 서버 상태와 연결 권한을 확인해 주세요.' : '연결 확인을 중지했습니다.') : error.message, 'error');
+  } finally {
+    clearTimeout(timeout);
+    busy = false;
+    controller = null;
+    controls();
+    if (connected) ui.prompt.focus();
+  }
+});
+
+$('chat-form').addEventListener('submit', async event => {
+  event.preventDefault();
+  const text = ui.prompt.value.trim();
+  if (!text || busy || !connected || !ui.model.value) return;
+  busy = true;
+  controller = new AbortController();
+  let timedOut = false;
+  const timeout = setTimeout(() => { timedOut = true; controller?.abort(); }, 180000);
+  const userMessage = bubble('user', text);
+  ui.prompt.value = '';
+  status(ui['chat-status'], 'AI가 답변을 만들고 있습니다. 첫 응답은 모델을 불러오느라 시간이 걸릴 수 있어요.');
+  controls();
+  try {
+    const data = await requestJSON(base, '/chat/completions', {
+      token: ui.token.value, signal: controller.signal,
+      body: { model: ui.model.value, messages: chatMessages(history, text), stream: false, temperature: 0.7, max_tokens: 1024 },
+    });
+    const result = assistantText(data);
+    history.push({ role: 'user', content: text }, { role: 'assistant', content: result.text });
+    history = history.slice(-24);
+    bubble('assistant', result.text);
+    status(ui['connection-status'], '연결됨 · AI 응답 확인 완료', 'success');
+    status(ui['chat-status'], result.limited ? '답변이 길이 제한에 도달했습니다. 이어서 설명해 달라고 요청할 수 있어요.' : '');
+  } catch (error) {
+    userMessage.classList.add('failed');
+    const note = document.createElement('div');
+    note.className = 'message-note';
+    note.textContent = '답변 미완료 · 대화 기억에 포함하지 않았습니다.';
+    userMessage.append(note);
+    ui.prompt.value = text;
+    status(ui['chat-status'], controller.signal.aborted ? (timedOut ? '3분 안에 답변이 도착하지 않았습니다. 모델 상태를 확인한 뒤 다시 시도해 주세요.' : '응답 수신을 중지했습니다. 입력한 메시지는 복원했습니다. 서버의 생성은 잠시 더 진행될 수 있습니다.') : error.message, 'error');
+  } finally {
+    clearTimeout(timeout);
+    busy = false;
+    controller = null;
+    controls();
+    ui.prompt.focus();
+  }
+});
+ui.prompt.addEventListener('keydown', event => {
+  if (event.key === 'Enter' && !event.shiftKey && !event.isComposing && event.keyCode !== 229) {
+    event.preventDefault();
+    $('chat-form').requestSubmit();
+  }
+});
+controls();
+
+</script>
+</body>
+</html>
