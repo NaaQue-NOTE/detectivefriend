@@ -888,18 +888,19 @@ function installDialogBackNavigation({documentObject=document,windowObject=windo
       if(history.state?.[key]===marker){waiting=true;history.back();}else marker=null;
     }
   }
-  function popped(){
+  function popped(event){
     if(destroyed)return;
-    if(waiting){waiting=false;marker=null;sync();return;}
+    if(waiting){if(event)event.detectivefriendDialogHandled=true;waiting=false;marker=null;sync();return;}
     const dialog=active;
     if(!dialog){sync();return;}
+    if(event)event.detectivefriendDialogHandled=true;
     if(dialog.getAttribute('aria-busy')==='true'){
       history.pushState(stateWith(marker),'');return;
     }
     active=null;marker=null;
-    const event=new windowObject.Event('cancel',{cancelable:true});
-    dialog.dispatchEvent(event);
-    if(dialog.open&&!event.defaultPrevented)dialog.close();
+    const cancelEvent=new windowObject.Event('cancel',{cancelable:true});
+    dialog.dispatchEvent(cancelEvent);
+    if(dialog.open&&!cancelEvent.defaultPrevented)dialog.close();
     sync();
   }
   const observer=new windowObject.MutationObserver(sync);
@@ -907,6 +908,46 @@ function installDialogBackNavigation({documentObject=document,windowObject=windo
   windowObject.addEventListener('popstate',popped);
   if(history.state?.[key]){waiting=true;history.back();}else sync();
   return {destroy(){destroyed=true;observer.disconnect();windowObject.removeEventListener('popstate',popped);}};
+}
+
+// 기록에는 화면 위치만 넣는다. 뒤로가기로 질문 전송·채점·삭제를 재실행하지 않는다.
+function installScreenBackNavigation({windowObject=window,onRestore,onError=()=>{}}) {
+  const history=windowObject.history,key='detectivefriendScreen';
+  let scope=null,live=null,signature=null,restoring=false,pending=null,queued=null,destroyed=false;
+  const stamp=route=>JSON.stringify(route.identity);
+  const entry=route=>({...history.state,[key]:{scope,route}});
+  function commit(route){
+    if(!scope||destroyed||restoring||!route)return;
+    if(history.state?.detectivefriendDialog){pending=route;return;}
+    const next=stamp(route),same=signature===next;
+    history[same?'replaceState':'pushState'](entry(route),'');
+    live=route;signature=next;pending=null;
+  }
+  async function popped(event){
+    if(destroyed||!scope)return;
+    if(event?.detectivefriendDialogHandled){if(pending)commit(pending);return;}
+    if(history.state?.detectivefriendDialog)return;
+    const saved=history.state?.[key];
+    if(!saved||saved.scope!==scope){if(live)history.replaceState(entry(live),'');return;}
+    if(restoring){queued=saved.route;return;}
+    restoring=true;
+    try {
+      let route=saved.route;
+      do {
+        queued=null;
+        if(await onRestore(route)===false){history.replaceState(entry(live),'');break;}
+        live=route;signature=stamp(route);route=queued;
+      }while(route);
+    }catch(error){if(live)history.replaceState(entry(live),'');onError(error);}
+    finally{restoring=false;}
+  }
+  windowObject.addEventListener('popstate',popped);
+  return {
+    reset(route){scope='screen-'+Date.now()+'-'+Math.random().toString(36).slice(2);live=route;signature=stamp(route);pending=queued=null;history.replaceState(entry(route),'');},
+    commit,
+    clear(){scope=null;live=null;pending=queued=null;const state={...history.state};delete state[key];history.replaceState(state,'');},
+    destroy(){destroyed=true;windowObject.removeEventListener('popstate',popped);},
+  };
 }
 
 const prefixes={E:'증거',S:'진술',G:'근거'};
@@ -1695,7 +1736,7 @@ function createSceneView({ node, api, action, render, presentationControls, curr
   }
   function reset() { disposePresentation();runId = null; selected = null; selectedEvidence = null; scroll = 0;mapStates={};presentationPlace=null;pendingFocus=null;mode='field';evidenceOnly=false;filters={search:'',place:'',status:'',extra:false};positions={};listScroll=0;detailScroll=0;backStack=[];location=null;queryStates={};queryEpoch++; }
   function sync() { if (runId !== current().id) { reset(); runId = current().id; } }
-  function navigation(){disposePresentation();return {mode,selected,selectedEvidence,evidenceOnly,filters:{...filters},positions:{...positions},listScroll,detailScroll,location:location?{...location}:null,mapStates:{...mapStates},backStack:[...backStack]};}
+  function navigation(disposeView=true){if(disposeView)disposePresentation();return {mode,selected,selectedEvidence,evidenceOnly,filters:{...filters},positions:{...positions},listScroll,detailScroll,location:location?{...location}:null,mapStates:{...mapStates},backStack:[...backStack]};}
   function restore(state){disposePresentation();if(!state)return;({mode,selected,selectedEvidence,evidenceOnly,listScroll,detailScroll,location=null}=state);filters={...state.filters};positions={...state.positions};mapStates={...state.mapStates};backStack=[...state.backStack];}
   const complete=groupComplete;
   function publicActions(group,run){return run.scene.actions.filter(item=>group[4].includes(item.id)&&item.publicVisible!==false);}
@@ -2143,7 +2184,7 @@ function createStatementView({ node, current, refresh, presentationControls, onE
   function reset() { runId = null; selected = null; person = ''; search = ''; status = ''; scroll = 0; nextFocus=null;detailScroll=0;activeContent=null;backStack=[]; }
   function sync() { if (runId !== current().id) { reset(); runId = current().id; } }
   function dispose(){if(activeContent){if(selected)detailScroll=readGameScroll(activeContent);else scroll=readGameScroll(activeContent);activeContent.onscroll=null;activeContent=null;}}
-  function navigation(){dispose();return {selected,person,search,status,scroll,detailScroll,backStack:[...backStack]};}
+  function navigation(disposeView=true){if(disposeView)dispose();return {selected,person,search,status,scroll,detailScroll,backStack:[...backStack]};}
   function restore(state){dispose();if(state)({selected,person,search,status,scroll,detailScroll}=state);backStack=[...(state?.backStack||[])];}
   function open(id, redraw = true, origin=null, focusId=null) { sync();if(!current().statements.some(item=>item.id===id))return false;const state=navigation();backStack.push(origin?{origin}:{state,focusId});selected = id;detailScroll=0; if (redraw) refresh();return true; }
   function returnStatement(rootId){const entry=backStack.at(-1);if(entry?.origin){void onReturn(entry.origin);return;}backStack.pop();if(entry?.state){restore(entry.state);nextFocus=entry.focusId||'statement-owned-'+rootId;}else{list();nextFocus='statement-owned-'+rootId;}refresh();}
@@ -2254,7 +2295,8 @@ function createGame({ api: requestApi, onExpired, onLogout, assetUrl, loadAsset 
   let sceneRefresh = 0;
   let accountEpoch = 0;
   let dialogueOrigin=null;
-  const mobilePanels=createMobilePanels({nav:el('mobile-case-nav'),tabs:Object.fromEntries(['play','people','records'].map(key=>[key,el('mobile-tab-'+key)])),panels:Object.fromEntries(['play','people','records'].map(key=>[key,el('mobile-panel-'+key)])),onSelect:key=>{if(key==='play'&&current?.screen==='dialogue'&&talks.state())updateDialogue(talks.state());}});
+  let navigation=null;
+  const mobilePanels=createMobilePanels({nav:el('mobile-case-nav'),tabs:Object.fromEntries(['play','people','records'].map(key=>[key,el('mobile-tab-'+key)])),panels:Object.fromEntries(['play','people','records'].map(key=>[key,el('mobile-panel-'+key)])),onSelect:key=>{if(key==='play'&&current?.screen==='dialogue'&&talks.state())updateDialogue(talks.state());scheduleNavigation();}});
   function showMobilePlay(){const changed=mobilePanels.current()!=='play';mobilePanels.select('play');if(changed&&mobilePanels.narrow())el('case-tab-'+current.screen)?.focus({preventScroll:true});}
   async function api(...args) {
     const startedEpoch = accountEpoch;
@@ -2277,6 +2319,30 @@ function createGame({ api: requestApi, onExpired, onLogout, assetUrl, loadAsset 
   }, onStatements: updateStatements, motionEnabled: () => !window.matchMedia('(prefers-reduced-motion: reduce)').matches });
   window.addEventListener('beforeunload', event => { if (notes.hasUnsaved() || resolution.hasUnsaved() || resolution.generating() || talks.hasUnsaved() || talks.generating()) { event.preventDefault(); event.returnValue = ''; } });
   const labels = { introduction: '사건 도입', dialogue: '대화', scene: '현장 조사', statements: '진술 카드', summary: '사건 정리', notebook: '개인 메모장' };
+  function screenLocation(){
+    if(!current)return {identity:['hub'],hub:true};
+    const scene=scenes.navigation(false),statement=statements.navigation(false),panel=mobilePanels.narrow()?mobilePanels.current():'play';
+    return {identity:[current.id,current.screen,current.screen==='dialogue'?current.selectedCharacter:null,panel,
+      current.screen==='scene'?[current.scene.placeId,scene.mode,scene.selected,scene.selectedEvidence,scene.location]:null,
+      current.screen==='statements'?statement.selected:null],runId:current.id,screen:current.screen,character:current.selectedCharacter,panel,
+      place:current.scene.placeId,scene,statement,dialogueOrigin,scroll:readGameScroll(el('game-content')),logScroll:el('case-dialogue-log')?.scrollTop||0};
+  }
+  function scheduleNavigation(){queueMicrotask(()=>{if(account&&loaded&&!busy&&!root.hidden)navigation?.commit(screenLocation());});}
+  navigation=installScreenBackNavigation({onError:error=>notice(error.message,true),onRestore:async location=>{
+    if(busy||!account||root.hidden)return false;
+    if(location.hub)return action(()=>loadHub());
+    // 다른 사건의 이력과 로그아웃 전 이력에서 예전 사건을 되살리지 않는다.
+    const list=await api('cases');if(list.saved?.id!==location.runId)return false;
+    return action(async()=>{
+      let next=await api('cases/open',{runId:location.runId});
+      next=await changeScreenFromLatest(api,next,location.screen,location.character);
+      if(location.screen==='scene'&&location.place!==next.scene.placeId)
+        next=await api('cases/scene',{runId:next.id,placeId:location.place,version:next.scene.version});
+      scenes.restore(location.scene);statements.restore(location.statement);dialogueOrigin=location.dialogueOrigin;render(next);mobilePanels.select(location.panel);
+      requestAnimationFrame(()=>{restoreGameScroll(el('game-content'),location.scroll);const log=el('case-dialogue-log');if(log)log.scrollTop=location.logScroll;});
+    });
+  }});
+  root.addEventListener('pointerdown',()=>{if(account&&loaded&&!busy)navigation.commit(screenLocation());},{capture:true});
   function notice(text, failed = false) {
     setStateMessage(el('game-status'),{node,text,tone:failed?'error':busy?'waiting':'done',assetUrl});
     el('game-status').dataset.tone = failed ? 'error' : '';
@@ -2564,7 +2630,7 @@ function createGame({ api: requestApi, onExpired, onLogout, assetUrl, loadAsset 
     lock(true); notice('기록을 확인하고 있습니다…');
     try { const result=await work(); return accountEpoch===startedEpoch&&result!==false; }
     catch (error) { if (accountEpoch === startedEpoch && !onExpired(error)) notice(error.message + ' 수사실로 돌아가 저장 상태를 다시 확인해 주세요.', true); return false; }
-    finally { if (accountEpoch === startedEpoch) lock(false); }
+    finally { if (accountEpoch === startedEpoch) {lock(false);scheduleNavigation();} }
   }
   async function loadHub({ resume = false } = {}) {
     loaded = false;
@@ -2598,6 +2664,7 @@ function createGame({ api: requestApi, onExpired, onLogout, assetUrl, loadAsset 
     article.append(node('p', evidence.interpretation)); return article;
   }
   function showContent() {
+    scheduleNavigation();
     scenes.disposePresentation();statements.dispose();
     const content = el('game-content'); content.onscroll = null; restoreGameScroll(content, 0); content.replaceChildren();
     content.classList.toggle('dialogue-screen', current.screen === 'dialogue' && !!current.catalog.characters.find(item => item.id === current.selectedCharacter)?.connected);
@@ -2793,6 +2860,7 @@ function createGame({ api: requestApi, onExpired, onLogout, assetUrl, loadAsset 
       mobilePanels.reset();
       scenes.reset(); statements.reset();dialogueOrigin=null;
       account = user; root.hidden = !user; current = null; saved = null; command = null; loaded = false; confirms.invalidate();
+      if(user)navigation.reset({identity:['hub'],hub:true});else navigation.clear();
       document.body.classList.toggle('in-game', !!user); el('case-toolbar-details').hidden = true;
       notes.account(user?.id ?? null);
       resolution.account(user?.id ?? null);
@@ -3052,8 +3120,8 @@ await enterService();
     <section id="auth" class="entry" aria-labelledby="auth-title" hidden>
       <div class="welcome"><p class="eyebrow">당신만의 수사실</p><h1>모든 진실은<br>질문에서 시작됩니다.</h1><p class="intro">여덟 명의 용의자, 서로 다른 이야기.<br>당신의 질문으로 사건의 실마리를 찾아보세요.</p><div class="case-note"><span>개발 중인 첫 사건</span><h2>유리관 속의 거짓말</h2><p>여덟 관계자의 진술과 현장 자료를 서로 대조해 보세요.<br>탐정 보조와 기록을 확인하고 나만의 추론을 제출할 수 있어요.</p></div></div>
       <div class="account-form"><div class="switch"><button id="login-tab" type="button" aria-pressed="true">로그인</button><button id="register-tab" type="button" aria-pressed="false">회원가입</button></div><h2 id="auth-title">다시 만나 반갑습니다.</h2><p id="auth-intro" class="intro">가입한 아이디로 들어오세요.</p>
-        <form id="auth-form" novalidate><label for="username">아이디</label><input id="username" name="username" required minlength="3" maxlength="24" autocomplete="username" autocapitalize="none" spellcheck="false" aria-describedby="id-hint"><p id="id-hint" class="hint">한글·영문·숫자·밑줄·붙임표, 3~24자</p><label for="password">비밀번호</label><input id="password" name="password" type="password" required minlength="4" maxlength="128" autocomplete="current-password" aria-describedby="password-hint"><p id="password-hint" class="hint">4~128자 · 이메일 없이 가입할 수 있어요.</p><button id="auth-submit" type="submit" class="primary full">로그인</button></form>
-        <p id="auth-status" class="status" role="status" aria-live="polite">로그인 상태를 확인하고 있습니다…</p><p class="privacy">계정과 대화는 운영자 PC에 보관합니다.<br>비밀번호 찾기는 아직 제공하지 않습니다.</p>
+        <form id="auth-form" novalidate><label for="username">아이디</label><input id="username" name="username" required minlength="3" maxlength="24" autocomplete="username" autocapitalize="none" spellcheck="false" aria-describedby="id-hint"><p id="id-hint" class="hint">한글·영문·숫자·밑줄·붙임표, 3~24자</p><label for="password">비밀번호</label><input id="password" name="password" type="password" required minlength="4" maxlength="16" autocomplete="current-password" aria-describedby="password-hint"><p id="password-hint" class="hint">4~16자 · 이메일 없이 가입할 수 있어요.</p><button id="auth-submit" type="submit" class="primary full">로그인</button></form>
+        <p id="auth-status" class="status" role="status" aria-live="polite">로그인 상태를 확인하고 있습니다…</p>
       </div>
     </section>
     <section id="game" class="game" hidden aria-label="사건 수사실">
