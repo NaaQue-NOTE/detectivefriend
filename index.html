@@ -126,7 +126,9 @@ html:has(body.in-game)::-webkit-scrollbar { display:none; width:0; height:0; }
 .original .repair { box-shadow:0 4px 4px #67594380; border-top:2px solid #f4ecce; }.copy .repair { background:#b8ac8a; }
 .character-header { display:flex; align-items:center; gap:16px; flex-shrink:0; }
 .character-identity { min-width:0; flex:1; }
-.game-content .character-identity h2 { font-size:23px; margin:0 0 8px; }
+.character-name-row { display:flex; align-items:center; gap:8px; flex-wrap:wrap; margin-bottom:8px; }
+.game .character-change-person { display:none; }
+.game-content .character-identity h2 { font-size:23px; margin:0; }
 .character-identity p { margin:0; }
 .game .character-reload { margin-left:auto; font-size:11px; padding:8px 10px; min-height:36px; }
 .game textarea { width:100%; min-height:105px; resize:vertical; border:1px solid #5b686d; border-radius:8px; padding:14px; background:#1a292e; color:#c5cecc; }
@@ -218,6 +220,7 @@ html:has(body.in-game)::-webkit-scrollbar { display:none; width:0; height:0; }
   .game-topbar .toolbar-indicators{gap:0 6px}
   .game-topbar .toolbar-indicators>:empty,.game-topbar #notebook-indicator[data-save-state="saved"]{display:none}
   .game .game-menu-dialog{top:48px;max-height:calc(100dvh - 64px)}
+  .game .character-change-person{display:inline-flex;align-items:center;justify-content:center;min-height:32px;padding:5px 8px;font-size:11px;white-space:nowrap;border-color:#cbb280;color:#e4d4b1;background:#26373c}
   .mobile-case-nav{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:4px;padding:4px 10px;background:#101c22;border-bottom:1px solid #607a7a;flex-shrink:0}
   .game .mobile-case-nav button{min-width:0;min-height:36px;padding:4px 5px;border-radius:8px;font-size:13px;white-space:nowrap;background:#18292f;color:#aebfbb}
   .game .mobile-case-nav button[aria-selected=true]{background:#cbb280;border-color:#cbb280;color:#142125;font-weight:700}
@@ -2680,7 +2683,17 @@ function createGame({ api: requestApi, onExpired, onLogout, assetUrl, loadAsset 
     } else if (current.screen === 'dialogue') {
       const character = current.catalog.characters.find(item => item.id === current.selectedCharacter);
       const heading = node('div', '', 'character-header');
-      const identity = node('div', '', 'character-identity'); identity.append(node('h2', character.name), node('p', character.job, 'game-muted'));
+      const identity = node('div', '', 'character-identity');
+      const nameRow = node('div', '', 'character-name-row');
+      const changePerson = node('button', '대화 상대 변경', 'character-change-person');
+      changePerson.type = 'button'; changePerson.id = 'case-change-person';
+      changePerson.setAttribute('aria-controls', 'mobile-panel-people');
+      changePerson.onclick = () => {
+        mobilePanels.select('people', {focus:true});
+        el('mobile-case-nav').scrollIntoView({block:'start',inline:'nearest'});
+      };
+      nameRow.append(node('h2', character.name), changePerson);
+      identity.append(nameRow, node('p', character.job, 'game-muted'));
       heading.append(createPortrait({node,person:character,variant:'header',assetUrl}), identity); content.append(heading);
       if (!character.connected) {
         content.append(node('div', character.id === 'assistant' ? '탐정 보조는 앞으로 확보한 주요 진술을 정리하고 다시 찾아주는 동료입니다. 기록 조회 대화는 준비 중입니다.' : '이 인물의 대화는 준비 중입니다. 관계자 목록에서 대화 가능한 인물을 골라 주세요.', 'game-callout'));
